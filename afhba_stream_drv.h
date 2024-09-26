@@ -10,15 +10,10 @@
 
 #include "rtm-t_ioctl.h"
 
-/* idea by John: make it a multiple of 3 to handle 96ch align case */
-#define NBUFFERS	66
-
-#define NBUFFERS_FIFO	NBUFFERS
-
-#define NBUFFERS_MASK	127
+/* dividable by 1, 2, 3, 4, 5, 6 for optimal alignment */
+#define NBUFFERS		60
 
 #define BUFFER_LEN	0x100000
-
 
 #define NSTATES		4
 #define N_DRV_STATES	3
@@ -105,21 +100,20 @@ struct AFHBA_STREAM_DEV {
 		unsigned errors;
 		unsigned buffers_discarded;
 
-		unsigned catchup_histo[NBUFFERS];
 		int dma_started;
 
 		struct XLLC_DEF push_llc_def;
 		struct XLLC_DEF pull_llc_def;
 		int (* on_push_dma_timeout)(struct AFHBA_DEV *adev);
 		int (* on_pull_dma_timeout)(struct AFHBA_DEV *adev);
-	}
-		job;
+	} job;
 	spinlock_t job_lock;
 
 	int push_dma_timeouts;
 	int pull_dma_timeouts;
 	unsigned *data_fifo_histo;
     unsigned *desc_fifo_histo;
+	unsigned *catchup_histo;
 
     void (*init_descriptors)(struct AFHBA_STREAM_DEV *sdev);
 
